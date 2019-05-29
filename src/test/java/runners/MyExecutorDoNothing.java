@@ -16,6 +16,6 @@ import org.junit.runner.RunWith;
         tags     = {"@trivial_empty"},
         monochrome = true
 )
-public class MyExecutorFirefox {
+public class MyExecutorDoNothing {
 
 }
