@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
         glue     = {"stepDefinitions"},
         format   = {
                         "pretty",
-                        "html:target/site/cucumber-pretty2",
+                        "html:target/site/cucumber-pretty4",
                         "json:target/cucumber.json",
         },
         tags     = {"@trivial_empty"},
