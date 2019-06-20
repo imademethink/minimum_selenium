@@ -5,8 +5,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
+import java.net.URL;
 import java.util.*;
 
 public class GeneralUtility extends GlobalObjects{
@@ -16,7 +18,8 @@ public class GeneralUtility extends GlobalObjects{
     }
 
     public WebDriver initChromeBrowser(boolean bLoadImages){
-        String strOSType = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+        String strOSType             = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+        String strRemoteWebDriverUrl = System.getProperty("remotewebdriverurl");
 
         Map<String, Object> prefs = new HashMap<String, Object>();
         prefs.put("profile.default_content_setting_values.notifications", 2);
@@ -39,7 +42,15 @@ public class GeneralUtility extends GlobalObjects{
         if(strOSType.contains("mac")){new File(path_chromedriver).setExecutable(true);}
         System.setProperty("webdriver.chrome.driver",path_chromedriver);
 
-        WebDriver driverLocal= new ChromeDriver(chromeCapabilities);
+        WebDriver driverLocal = null;
+        if(null==strRemoteWebDriverUrl){
+            driverLocal= new ChromeDriver(chromeCapabilities);
+        }else{
+            try{
+                driverLocal=new RemoteWebDriver(new URL(strRemoteWebDriverUrl), chromeCapabilities);}
+            catch(Exception e){}
+        }
+
         driverLocal.manage().window().setPosition(new Point(2,2));
         driverLocal.manage().window().setSize(new Dimension(1500,840));
         driverLocal.manage().deleteAllCookies();
@@ -47,18 +58,13 @@ public class GeneralUtility extends GlobalObjects{
     }
 
     public WebDriver initFireFoxBrowser(boolean bLoadImages){
+        String strRemoteWebDriverUrl = System.getProperty("remotewebdriverurl");
+
 //        Map<String, Object> prefs = new HashMap<String, Object>();
 //        prefs.put("profile.default_content_setting_values.notifications", 2);
         if(!bLoadImages) {
 //            prefs.put("profile.managed_default_content_settings.images", 2);
         }
-//        ChromeOptions objChromeOptions = new ChromeOptions();
-//        objChromeOptions.setExperimentalOption("prefs", prefs);
-//        objChromeOptions.addArguments("--incognito");
-//        objChromeOptions.addArguments("--disable-popup-blocking");
-//        DesiredCapabilities chromeCapabilities = DesiredCapabilities.chrome();
-//        chromeCapabilities.setCapability(ChromeOptions.CAPABILITY, objChromeOptions);
-//        System.setProperty("webdriver.chrome.driver",path_chromedriver);
 
         String strOSType = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
         if(strOSType.contains("win")){ path_gecodriver = path_gecodriver + ".exe";}
@@ -66,8 +72,18 @@ public class GeneralUtility extends GlobalObjects{
         if(strOSType.contains("mac")){ /* do nothing */}
 
         System.setProperty("webdriver.gecko.driver",path_gecodriver);
-        WebDriver driverLocal= new FirefoxDriver();
-        driverLocal.manage().window().setPosition(new Point(2,2));
+        DesiredCapabilities firefoxCapabilities = DesiredCapabilities.firefox();
+
+        WebDriver driverLocal = null;
+        if(null==strRemoteWebDriverUrl){
+            driverLocal= new FirefoxDriver(firefoxCapabilities);
+        }else{
+            try{
+                driverLocal=new RemoteWebDriver(new URL(strRemoteWebDriverUrl), firefoxCapabilities);}
+            catch(Exception e){}
+        }
+
+        driverLocal.manage().window().setPosition(new Point(50,50));
         driverLocal.manage().window().setSize(new Dimension(1500,840));
         driverLocal.manage().deleteAllCookies();
         return driverLocal;
